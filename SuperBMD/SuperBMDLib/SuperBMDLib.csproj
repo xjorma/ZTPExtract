@@ -213,7 +213,12 @@
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FbxBridge\FbxBridge.vcxproj">
+      <Project>{b3252c88-bf15-629f-fcfb-768725e06a7c}</Project>
+      <Name>FbxBridge</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
       <Visible>False</Visible>
