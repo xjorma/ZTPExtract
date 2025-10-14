@@ -42,8 +42,8 @@ namespace BrawlLib.Modeling.Triangle_Converter
         private uint m_MinStripSize;
         private bool m_BackwardSearch;
         private bool m_FirstRun;
-        private ushort[] m_Nodes;
-        private int[] m_ImpTable;
+        //private ushort[] m_Nodes;
+        //private int[] m_ImpTable;
         private List<Weight> m_CurrentWeights = new List<Weight>();
         private Weight[] m_Weights;
 

@@ -54,6 +54,19 @@ namespace SuperBMDLib.Materials
         public ZMode? ZMode;
         public NBTScale? NBTScale;
 
+        public override bool Equals(object obj)
+        {
+            // same semantics as your == operator: reference equality
+            return ReferenceEquals(this, obj);
+        }
+
+        public override int GetHashCode()
+        {
+            // keep identity-based hash
+            return base.GetHashCode();
+        }
+
+
         [JsonConstructor]
         public Material(string name)
         {
@@ -403,6 +416,7 @@ namespace SuperBMDLib.Materials
         public static bool operator ==(Material left, Material right)
         {
             return object.ReferenceEquals(left, right);
+            /*
 
             if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null)) {
                 return true;
@@ -525,6 +539,7 @@ namespace SuperBMDLib.Materials
                 return false;
 
             return true;
+            */
         }
 
         public static bool operator !=(Material left, Material right)

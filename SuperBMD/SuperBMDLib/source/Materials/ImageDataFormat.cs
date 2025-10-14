@@ -21,7 +21,7 @@ namespace Chadsoft.CTools.Image
 {
     public sealed class ImageDataFormat
     {
-        private static ImageDataFormat _i4, _i8, _ia4, _ia8, _rgb565, _rgb5a3, _rgba32, _c4, _c8, _c14x2, _cmpr;
+        private static ImageDataFormat _i4, _i8, _ia4, _ia8, _rgb565, _rgb5a3, _rgba32, /* _c4, _c8, _c14x2,*/ _cmpr;
 
         public static ImageDataFormat I4 { get { if (_i4 == null) _i4 = new ImageDataFormat("I4", "I4", 4, 0, 8, 8, 32, false, false, false, false, 0, 0, ConvertBlockToI4, ConvertBlockFromI4); return _i4; } }
         public static ImageDataFormat I8 { get { if (_i8 == null) _i8 = new ImageDataFormat("I8", "I8", 8, 0, 8, 4, 32, false, false, false, false, 0, 0, ConvertBlockToI8, ConvertBlockFromI8); return _i8; } }

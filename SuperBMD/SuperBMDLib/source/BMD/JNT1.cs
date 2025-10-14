@@ -162,7 +162,7 @@ namespace SuperBMDLib.BMD
             if (auto_detect) { 
                 Console.WriteLine("Attempting automated skeleton root detection...");
                 Assimp.Bone bone = null;
-                Assimp.Node meshparent = null;
+                //Assimp.Node meshparent = null;
                 foreach (Assimp.Mesh mesh in scene.Meshes)
                 {
                     if (bone != null) { 

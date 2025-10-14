@@ -303,7 +303,7 @@ namespace SuperBMDLib.Materials
             Width = (ushort)texData.Width;
             Height = (ushort)texData.Height;
 
-            int texDataSize = 0;
+            //int texDataSize = 0;
 
 
             m_rgbaImageData = new byte[Width * Height * 4];
@@ -436,7 +436,7 @@ namespace SuperBMDLib.Materials
             try {
                 texData = new Bitmap(texFilePath);
             }
-            catch (ArgumentException e) {
+            catch (ArgumentException /*e*/) {
                 try {
                     texData = TgaReader.Load(texFilePath);
                 }
