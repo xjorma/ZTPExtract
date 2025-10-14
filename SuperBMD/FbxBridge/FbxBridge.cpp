@@ -90,43 +90,46 @@ void FbxSceneWriter::AddMeshWithMaterial(
     FbxLayer* layer0 = mesh->GetLayer(0);
 
     // UVs
-    const bool hasUvs = (uvs != nullptr && uvs->Length >= triCount * 3 * 2);
+    // Check if the number of UVs matches the number of vertices.
+    const bool hasUvs = (uvs != nullptr && uvs->Length >= vCount * 2);
     FbxLayerElementUV* uvElem = nullptr;
     if (hasUvs) {
-        uvElem = FbxLayerElementUV::Create(mesh, "UVSet"); // default name
+        uvElem = FbxLayerElementUV::Create(mesh, "UVSet");
         uvElem->SetMappingMode(FbxLayerElement::eByPolygonVertex);
         uvElem->SetReferenceMode(FbxLayerElement::eDirect);
-        uvElem->GetDirectArray().SetCount(triCount * 3);
+
+        // Add the UV coordinates to the direct array.
+        uvElem->GetDirectArray().SetCount(indices->Length);
+        for (int i = 0; i < indices->Length; ++i) {
+            int native_index = indices[i];
+            uvElem->GetDirectArray().SetAt(i, FbxVector2(uvs[native_index * 2 + 0], uvs[native_index * 2 + 1]));
+        }
+        // Assign the UVs to the layer.
+        layer0->SetUVs(uvElem);
     }
 
-    // build triangles and fill UVs
-    int uvIt = 0;
+    // build triangles
     for (int t = 0; t < triCount; ++t) {
         mesh->BeginPolygon();
         for (int k = 0; k < 3; ++k) {
-            const int vi = indices[t * 3 + k];
-            mesh->AddPolygon(vi);
-            if (hasUvs) {
-                const double u = uvs[uvIt * 2 + 0];
-                const double v = uvs[uvIt * 2 + 1];
-                uvElem->GetDirectArray().SetAt(uvIt, FbxVector2(u, v));
-                ++uvIt;
-            }
+            // The index array for the polygons remains the same.
+            mesh->AddPolygon(indices[t * 3 + k]);
         }
         mesh->EndPolygon();
     }
-    if (hasUvs) layer0->SetUVs(uvElem);
+    // Note: The call to layer0->SetUVs() was moved up to keep the UV logic together.
 
-    // Normals
+    // Normals (Your existing normal code is correct for per-vertex normals)
     const bool hasNormals = (normals != nullptr && normals->Length >= vCount * 3);
     if (hasNormals) {
         FbxLayerElementNormal* n = FbxLayerElementNormal::Create(mesh, "Normals");
-        n->SetMappingMode(FbxLayerElement::eByControlPoint); // per vertex
+        n->SetMappingMode(FbxLayerElement::eByPolygonVertex); // per vertex
         n->SetReferenceMode(FbxLayerElement::eDirect);
-        n->GetDirectArray().SetCount(vCount);
-        for (int i = 0; i < vCount; ++i) {
+        n->GetDirectArray().SetCount(indices->Length);
+        for (int i = 0; i < indices->Length; ++i) {
+			int native_index = indices[i];
             n->GetDirectArray().SetAt(i, FbxVector4(
-                normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2], 0.0));
+                normals[native_index * 3 + 0], normals[native_index * 3 + 1], normals[native_index * 3 + 2], 0.0));
         }
         layer0->SetNormals(n);
     }
@@ -137,7 +140,7 @@ void FbxSceneWriter::AddMeshWithMaterial(
     node->SetNodeAttribute(mesh);
     mScene->GetRootNode()->AddChild(node);
 
-    FbxSurfacePhong* mat = FbxSurfacePhong::Create(mScene, "Mat");
+    FbxSurfaceLambert* mat = FbxSurfaceLambert::Create(mScene, "Mat");
     mat->Diffuse.Set(FbxDouble3(1.0, 1.0, 1.0));
     mat->DiffuseFactor.Set(1.0);
     node->AddMaterial(mat);
