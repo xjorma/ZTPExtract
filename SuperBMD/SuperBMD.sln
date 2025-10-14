@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperBMD", "SuperBMD\SuperB
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FbxBridge", "FbxBridge\FbxBridge.vcxproj", "{B3252C88-BF15-629F-FCFB-768725E06A7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchExport", "BatchExport\BatchExport.csproj", "{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{828BE5E5-9E98-46C9-B63E-D2D03322A825} = {828BE5E5-9E98-46C9-B63E-D2D03322A825}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +60,18 @@ Global
 		{B3252C88-BF15-629F-FCFB-768725E06A7C}.Release|x64.Build.0 = Release|x64
 		{B3252C88-BF15-629F-FCFB-768725E06A7C}.Release|x86.ActiveCfg = Release|Win32
 		{B3252C88-BF15-629F-FCFB-768725E06A7C}.Release|x86.Build.0 = Release|Win32
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Debug|x64.ActiveCfg = Debug|x64
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Debug|x64.Build.0 = Debug|x64
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Release|x64.ActiveCfg = Release|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Release|x64.Build.0 = Release|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B1F28DE-9C76-45CD-AF8D-4D4BBAB8307A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
