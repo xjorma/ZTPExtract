@@ -55,7 +55,7 @@ void FbxSceneWriter::CreateScene(System::String^ name)
     if (!mScene) throw gcnew System::Exception("Failed to create FbxScene");
 
     auto& gs = mScene->GetGlobalSettings();
-    gs.SetSystemUnit(FbxSystemUnit::m);
+    gs.SetSystemUnit(FbxSystemUnit::cm);
     gs.SetAxisSystem(FbxAxisSystem::MayaYUp);
 }
 
