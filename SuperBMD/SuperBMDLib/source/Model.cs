@@ -124,28 +124,34 @@ namespace SuperBMDLib
             Textures          = new TEX1(reader, (int)reader.BaseStream.Position, ModelStats);
             Materials.SetTextureNames(Textures);
 
-            
-            if (args.output_materials_path != "") {
-                Materials.DumpMaterials(Path.GetDirectoryName(args.output_materials_path));
-            }
-            else {
-                if (args.output_path != "") {
-                    string outDir = Path.GetDirectoryName(args.output_path);
-                    string filenameNoExt = Path.GetFileNameWithoutExtension(args.input_path);
-                    Materials.DumpMaterials(Path.Combine(outDir, filenameNoExt+"_materials.json"));
-                }
-                else {
-                    string inDir = Path.GetDirectoryName(args.input_path);
-                    string filenameNoExt = Path.GetFileNameWithoutExtension(args.input_path);
-
-                    Materials.DumpMaterials(Path.Combine(inDir, filenameNoExt+"_materials.json"));
-                }
-
-            }
-
-            if (args.output_material_folder != "")
+            if (!args.export_fbx)
             {
-                Materials.DumpMaterialsFolder(args.output_material_folder);
+                if (args.output_materials_path != "")
+                {
+                    Materials.DumpMaterials(Path.GetDirectoryName(args.output_materials_path));
+                }
+                else
+                {
+                    if (args.output_path != "")
+                    {
+                        string outDir = Path.GetDirectoryName(args.output_path);
+                        string filenameNoExt = Path.GetFileNameWithoutExtension(args.input_path);
+                        Materials.DumpMaterials(Path.Combine(outDir, filenameNoExt + "_materials.json"));
+                    }
+                    else
+                    {
+                        string inDir = Path.GetDirectoryName(args.input_path);
+                        string filenameNoExt = Path.GetFileNameWithoutExtension(args.input_path);
+
+                        Materials.DumpMaterials(Path.Combine(inDir, filenameNoExt + "_materials.json"));
+                    }
+
+                }
+
+                if (args.output_material_folder != "")
+                {
+                    Materials.DumpMaterialsFolder(args.output_material_folder);
+                }
             }
 
             foreach (Geometry.Shape shape in Shapes.Shapes)
@@ -437,10 +443,13 @@ namespace SuperBMDLib
             Scenegraph.CorrectMaterialIndices(outScene, Materials);
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine("Processing Textures ->");
-            Textures.DumpTextures(outDir, fileNameNoExt+"_tex_headers.json", true, cmdargs.readMipmaps);
+            if(modelType != "fbx")
+            {
+                Console.WriteLine("Processing Textures ->");
+                Textures.DumpTextures(outDir, fileNameNoExt + "_tex_headers.json", true, cmdargs.readMipmaps);
 
-            this.Scenegraph.DumpJson(Path.Combine(outDir, fileNameNoExt+"_hierarchy.json"));
+                this.Scenegraph.DumpJson(Path.Combine(outDir, fileNameNoExt + "_hierarchy.json"));
+            }
             //this.Joints.DumpJson(Path.Combine(outDir, fileNameNoExt+"_joints.json"));
             //this.PartialWeightData.DumpJson(Path.Combine(outDir, fileNameNoExt+"_partialweights.json"));
             //this.Shapes.DumpJson(Path.Combine(outDir, fileNameNoExt+"_shapes.json"));
