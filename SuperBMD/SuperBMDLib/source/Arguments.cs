@@ -21,6 +21,7 @@ namespace SuperBMDLib
         public bool sort_strict;
         public bool ensure_one_material_per_mesh;
         public bool export_obj;
+        public bool export_fbx;
         public bool forceFloat;
         public bool degenerateTriangles;
         public bool readMipmaps;
@@ -63,6 +64,7 @@ namespace SuperBMDLib
             sort_strict = false;
             ensure_one_material_per_mesh = false;
             export_obj = false;
+            export_fbx = false;
             forceFloat = false;
             degenerateTriangles = false;
             readMipmaps = true;
@@ -165,6 +167,9 @@ namespace SuperBMDLib
                         break;
                     case "--exportobj":
                         export_obj = true;
+                        break;
+                    case "--exportfbx":
+                        export_fbx = true;
                         break;
                     case "--texfloat32":
                         forceFloat = true;

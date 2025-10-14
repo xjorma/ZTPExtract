@@ -147,6 +147,9 @@ namespace SuperBMDLib
                 if (cmd_args.export_obj) {
                     mod.ExportAssImp(cmd_args.output_path, "obj", settings, cmd_args);
                 }
+                else if (cmd_args.export_fbx) {
+                    mod.ExportAssImp(cmd_args.output_path, "fbx", settings, cmd_args);
+                }
                 else {
                     mod.ExportAssImp(cmd_args.output_path, "dae", settings, cmd_args);
                 }

@@ -10,7 +10,8 @@ using SuperBMDLib.BMD;
 using SuperBMDLib.Animation;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Reflection;
+
+using FbxBridge;
 
 using SuperBMDLib.Geometry;
 using SuperBMDLib.Geometry.Enums;
@@ -408,12 +409,20 @@ namespace SuperBMDLib
             fileName = Path.GetFullPath(fileName); // Get absolute path instead of relative
             string outDir = Path.GetDirectoryName(fileName);
             string fileNameNoExt = Path.GetFileNameWithoutExtension(fileName);
-            if (modelType == "obj") {
+
+            if (modelType == "obj")
+            {
                 fileName = Path.Combine(outDir, fileNameNoExt + ".obj");
             }
-            else {
+            else if (modelType == "fbx")
+            {
+                fileName = Path.Combine(outDir, fileNameNoExt + ".fbx");
+            }
+            else
+            {
                 fileName = Path.Combine(outDir, fileNameNoExt + ".dae");
             }
+
             Scene outScene = new Scene { RootNode = new Node("RootNode") };
 
             Console.WriteLine();
@@ -451,7 +460,80 @@ namespace SuperBMDLib
 
             AssimpContext cont = new AssimpContext();
 
-            if (modelType == "obj") {
+            if (modelType == "fbx")
+            {
+                // Build FBX scene
+                var writer = new FbxSceneWriter();
+                writer.CreateScene(fileNameNoExt);
+
+                for (int m = 0; m < outScene.MeshCount; m++)
+                {
+                    var mesh = outScene.Meshes[m];
+                    var name = string.IsNullOrEmpty(mesh.Name) ? $"Mesh_{m}" : mesh.Name;
+
+                    // verts xyz
+                    var verts = new List<float>(mesh.VertexCount * 3);
+                    foreach (var v in mesh.Vertices)
+                    {
+                        verts.Add(v.X);
+                        verts.Add(v.Y);
+                        verts.Add(v.Z);
+                    }
+
+                    // indices as triangles
+                    var indices = new List<int>();
+                    foreach (var f in mesh.Faces)
+                    {
+                        if (f.IndexCount == 3) { indices.Add(f.Indices[0]); indices.Add(f.Indices[1]); indices.Add(f.Indices[2]); }
+                        // skip non triangles, your scene builder should already triangulate
+                    }
+
+                    // uv0 if present
+                    var uvs = new List<float>();
+                    if (mesh.HasTextureCoords(0))
+                    {
+                        foreach (var uv in mesh.TextureCoordinateChannels[0])
+                        {
+                            uvs.Add(uv.X);
+                            uvs.Add(uv.Y);
+                        }
+                    }
+
+                    // normals if present
+                    var norms = new List<float>();
+                    if (mesh.HasNormals)
+                    {
+                        foreach (var n in mesh.Normals)
+                        {
+                            norms.Add(n.X);
+                            norms.Add(n.Y);
+                            norms.Add(n.Z);
+                        }
+                    }
+
+
+                    // try to find a diffuse texture path
+                    string texPath = null;
+                    var mat = outScene.Materials[mesh.MaterialIndex];
+                    if (mat.HasTextureDiffuse) texPath = mat.TextureDiffuse.FilePath;
+
+                    writer.AddMeshWithMaterial(
+                        name,
+                        verts.ToArray(),
+                        indices.ToArray(),
+                        uvs.Count > 0 ? uvs.ToArray() : Array.Empty<float>(),
+                        norms.Count > 0 ? norms.ToArray() : Array.Empty<float>(),
+                        texPath ?? string.Empty
+                    );
+                }
+
+                // write FBX, use binary by default
+                writer.Save(fileName, ascii: false);
+                return;
+            }
+
+            if (modelType == "obj")
+            {
                 Console.WriteLine("Writing the OBJ file...");
                 cont.ExportFile(outScene, fileName, "obj");//, PostProcessSteps.ValidateDataStructure);
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(fileName)) {
