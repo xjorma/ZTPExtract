@@ -4,6 +4,7 @@
 #include <msclr/marshal_cppstd.h>
 #include <string>
 #include <cstring>
+#include <map>
 
 using namespace FbxBridge;
 
@@ -136,18 +137,22 @@ void FbxSceneWriter::AddMeshWithMaterial(
 
 
     // node and material
+    System::String^ baseNameCLI = System::IO::Path::GetFileNameWithoutExtension(texturePath);
+    std::string baseNameStd = msclr::interop::marshal_as<std::string>(baseNameCLI);
+    std::string matName = baseNameStd + "_mat";
+    std::string texName = baseNameStd + "_tex";
     FbxNode* node = FbxNode::Create(mScene, ToUtf8(nodeName).c_str());
     node->SetNodeAttribute(mesh);
     mScene->GetRootNode()->AddChild(node);
 
-    FbxSurfaceLambert* mat = FbxSurfaceLambert::Create(mScene, "Mat");
+	FbxSurfaceLambert* mat = FbxSurfaceLambert::Create(mScene, matName.c_str());
     mat->Diffuse.Set(FbxDouble3(1.0, 1.0, 1.0));
     mat->DiffuseFactor.Set(1.0);
     node->AddMaterial(mat);
 
     const std::string texPath = ToUtf8(texturePath);
     if (!texPath.empty()) {
-        FbxFileTexture* tex = FbxFileTexture::Create(mScene, "Tex");
+        FbxFileTexture* tex = FbxFileTexture::Create(mScene, texName.c_str());
         tex->SetFileName(texPath.c_str());
         tex->SetTextureUse(FbxTexture::eStandard);
         tex->SetMappingType(FbxTexture::eUV);

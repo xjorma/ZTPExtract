@@ -5,5 +5,6 @@
 #include <msclr/marshal_cppstd.h>
 #include <string>
 #include <cstring>
+#include <map>
 
 #endif //PCH_H
