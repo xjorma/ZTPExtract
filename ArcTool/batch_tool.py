@@ -1,6 +1,7 @@
 import sys
 import os
 import ARCTool
+from pathlib import Path
 
 def extract_arc(src, out):
     """
@@ -18,6 +19,7 @@ def extract_arc(src, out):
     ARCTool.main()
 
     # Pass 2: Extract uncompressed archive to the output folder
+    Path(out).mkdir(parents=True, exist_ok=True) # Ensure output directory exists
     sys.argv = ["ARCTool", "-o", out, temp]
     ARCTool.main()
 
@@ -29,7 +31,36 @@ def extract_arc(src, out):
     else:
         print(f"The file {temp} does not exist")
 
-src  = "D:/ztp_work/res/Stage/D_MN01A/STG_00.arc"
-out2 = "D:/temp/STG_00_extracted"      # folder for final extraction
+def extract_all(src_root, dst_root):
+    src_root = Path(src_root).resolve()
+    dst_root = Path(dst_root).resolve()
 
-extract_arc(src, out2)
+    # Gather candidates. Include .arc and .ARC for safety.
+    paths = [p for p in src_root.rglob("*") if p.suffix.lower() == ".arc"]
+    total = len(paths)
+    print(f"Found {total} archives under {src_root}")
+
+    if total == 0:
+        return
+
+    for i, arc_path in enumerate(paths, start=1):
+        try:
+            rel_parent = arc_path.parent.resolve().relative_to(src_root)
+        except ValueError:
+            # Fallback if file is not under src_root after resolution
+            rel_parent = Path()
+
+        out_folder = dst_root / rel_parent / arc_path.stem
+        out_folder.mkdir(parents=True, exist_ok=True)
+
+        print(f"Extracting {i}/{total}: {arc_path} -> {out_folder}")
+        try:
+            extract_arc(str(arc_path), str(out_folder))
+        except Exception as ex:
+            print(f"WARNING: failed to extract {arc_path}: {ex}")
+
+if __name__ == "__main__":
+    # example usage
+    SRC = r"D:\ztp_work\res\Stage"
+    DST = r"D:\temp\stage_extracted"
+    extract_all(SRC, DST)
