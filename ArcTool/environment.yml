@@ -2,5 +2,5 @@ name: arctool
 channels:
   - defaults
 dependencies:
-  - python=2.7
+  - python=3.11
   - pip
