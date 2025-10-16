@@ -1,0 +1,1 @@
+call conda env create -p ./env -f environment.yml

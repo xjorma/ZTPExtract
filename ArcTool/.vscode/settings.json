@@ -1,0 +1,4 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}\\env\\python.exe",
+  "python.terminal.activateEnvironment": true
+}
