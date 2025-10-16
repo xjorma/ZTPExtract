@@ -542,7 +542,7 @@ namespace SuperBMDLib
                 writer.Save(fileName, ascii: false);
 
                 // delete all png and jpg files we created zelda_tex_headers.json in the output folder
-                foreach (var pattern in new[] { "*.png", "*.jpg", "*.jpeg", "zelda_tex_headers.json" })
+                foreach (var pattern in new[] { "*.png", "*.jpg", "*.jpeg", "*_tex_headers.json" })
                 {
                     foreach (var file in Directory.EnumerateFiles(outDir, pattern, SearchOption.TopDirectoryOnly))
                     {

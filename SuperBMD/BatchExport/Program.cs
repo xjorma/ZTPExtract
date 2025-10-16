@@ -34,30 +34,33 @@ namespace BatchExport
                 Directory.CreateDirectory(outDir);
 
                 var sources = new List<string>();
-                foreach (var p in Directory.GetFiles(inDir, "*.*", SearchOption.AllDirectories))
-                {
-                    string ext = Path.GetExtension(p).ToLowerInvariant();
-                    if (ext == ".bmd" || ext == ".bdl") sources.Add(p);
-                }
+                foreach (var p in Directory.GetFiles(inDir, "*.bmd", SearchOption.AllDirectories))
+                    sources.Add(p);
+                // If you also want .bdl, uncomment the next line.
+                // sources.AddRange(Directory.GetFiles(inDir, "*.bdl", SearchOption.AllDirectories));
 
                 if (sources.Count == 0)
                 {
-                    Console.WriteLine("No .bmd or .bdl files found.");
+                    Console.WriteLine("No .bmd files found.");
                     return 0;
                 }
 
-                var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 int ok = 0, fail = 0;
 
                 foreach (var src in sources)
                 {
-                    string baseName = Path.GetFileNameWithoutExtension(src);
-                    string outName = MakeUnique(baseName + ".fbx", usedNames, outDir);
-                    string dst = Path.Combine(outDir, outName);
+                    string relPath = GetRelativePath(inDir, src);
+                    string relDir = Path.GetDirectoryName(relPath) ?? string.Empty;
+
+                    string dstDir = Path.Combine(outDir, relDir);
+                    Directory.CreateDirectory(dstDir);
+
+                    string dstFile = Path.GetFileNameWithoutExtension(src) + ".fbx";
+                    string dst = Path.Combine(dstDir, dstFile);
 
                     Console.WriteLine("Converting: " + src);
-
                     bool success = ConvertWithSuperBmdLib(src, dst);
+
                     if (success)
                     {
                         ok++;
@@ -84,15 +87,15 @@ namespace BatchExport
         {
             try
             {
-                // Minimal args, input then output
+                // Build args for SuperBMDLib
                 var libArgs = new Arguments(new[] { src, dst, "--exportfbx" });
 
                 var model = Model.Load(libArgs, mat_presets: null, additionalTexPath: null);
 
-                // Your SuperBMDLib constructor requires a bool
+                // Adjust this if your ExportSettings signature differs in your fork
                 var settings = new ExportSettings(false);
 
-                // Export to FBX
+                // Export as FBX
                 model.ExportAssImp(dst, "fbx", settings, libArgs);
 
                 return File.Exists(dst);
@@ -104,21 +107,25 @@ namespace BatchExport
             }
         }
 
-        private static string MakeUnique(string fileName, HashSet<string> used, string outDir)
+        private static string GetRelativePath(string baseDir, string fullPath)
         {
-            string name = fileName;
-            string stem = Path.GetFileNameWithoutExtension(fileName);
-            string ext = Path.GetExtension(fileName);
-            int i = 1;
+            if (string.IsNullOrEmpty(baseDir)) throw new ArgumentNullException(nameof(baseDir));
+            if (string.IsNullOrEmpty(fullPath)) throw new ArgumentNullException(nameof(fullPath));
 
-            while (used.Contains(name) || File.Exists(Path.Combine(outDir, name)))
+            baseDir = Path.GetFullPath(baseDir);
+            fullPath = Path.GetFullPath(fullPath);
+
+            if (!baseDir.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
+                !baseDir.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
             {
-                name = stem + "_" + i + ext;
-                i++;
+                baseDir += Path.DirectorySeparatorChar;
             }
 
-            used.Add(name);
-            return name;
+            var baseUri = new Uri(baseDir, UriKind.Absolute);
+            var pathUri = new Uri(fullPath, UriKind.Absolute);
+            var relUri = baseUri.MakeRelativeUri(pathUri);
+            var rel = Uri.UnescapeDataString(relUri.ToString());
+            return rel.Replace('/', Path.DirectorySeparatorChar);
         }
     }
 }
