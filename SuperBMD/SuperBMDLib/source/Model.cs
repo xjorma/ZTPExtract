@@ -443,11 +443,13 @@ namespace SuperBMDLib
             Scenegraph.CorrectMaterialIndices(outScene, Materials);
             Console.WriteLine();
             Console.WriteLine();
-            if(modelType != "fbx")
-            {
-                Console.WriteLine("Processing Textures ->");
-                Textures.DumpTextures(outDir, fileNameNoExt + "_tex_headers.json", true, cmdargs.readMipmaps);
+            Console.WriteLine("Processing Textures ->");
 
+            //Textures.DumpTextures(outDir, fileNameNoExt + "_tex_headers.json", true, cmdargs.readMipmaps);
+            Textures.DumpTextures(outDir, fileNameNoExt + "_tex_headers.json", true, false);
+
+            if (modelType != "fbx")
+            {
                 this.Scenegraph.DumpJson(Path.Combine(outDir, fileNameNoExt + "_hierarchy.json"));
             }
             //this.Joints.DumpJson(Path.Combine(outDir, fileNameNoExt+"_joints.json"));
@@ -538,6 +540,26 @@ namespace SuperBMDLib
 
                 // write FBX, use binary by default
                 writer.Save(fileName, ascii: false);
+
+                // delete all png and jpg files we created zelda_tex_headers.json in the output folder
+                foreach (var pattern in new[] { "*.png", "*.jpg", "*.jpeg", "zelda_tex_headers.json" })
+                {
+                    foreach (var file in Directory.EnumerateFiles(outDir, pattern, SearchOption.TopDirectoryOnly))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                            Console.WriteLine($"Deleted {Path.GetFileName(file)}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Could not delete {file}: {ex.Message}");
+                        }
+                    }
+                }
+
+
+
                 return;
             }
 
