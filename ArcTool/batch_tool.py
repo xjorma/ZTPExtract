@@ -3,6 +3,26 @@ import os
 import ARCTool
 from pathlib import Path
 
+def is_yaz0(path: str) -> bool:
+    """
+    Check if a file is a Yaz0 archive based on its magic bytes.
+
+    Parameters:
+        path (str): Path to the file to check.
+
+    Returns:
+        bool: True if the file starts with 'Yaz0', False otherwise.
+    """
+    if not os.path.isfile(path):
+        return False
+
+    try:
+        with open(path, "rb") as f:
+            header = f.read(4)
+            return header == b"Yaz0"
+    except OSError:
+        return False
+
 def extract_arc(src, out):
     """
     Extracts an archive file to a specified output folder.
@@ -13,15 +33,20 @@ def extract_arc(src, out):
     """
     saved_cwd = os.getcwd()  # Save current working directory because ARCTool changes it
 
-    # Pass 1: Uncompress the archive to a temporary file
-    temp = "./temp.arc"  # Intermediate uncompressed archive
-    sys.argv = ["ARCTool", "-o", temp, src]
-    ARCTool.main()
-
-    # Pass 2: Extract uncompressed archive to the output folder
     Path(out).mkdir(parents=True, exist_ok=True) # Ensure output directory exists
-    sys.argv = ["ARCTool", "-o", out, temp]
-    ARCTool.main()
+    if(is_yaz0(src)):
+        # Pass 1: Uncompress the archive to a temporary file
+        temp = str(Path("./temp.arc").resolve())  # Intermediate uncompressed archive
+        sys.argv = ["ARCTool", "-o", temp, src]
+        ARCTool.main()
+
+        # Pass 2: Extract uncompressed archive to the output folder
+        sys.argv = ["ARCTool", "-o", out, temp]
+        ARCTool.main()
+    else:
+        # Directly extract the archive to the output folder
+        sys.argv = ["ARCTool", "-o", out, src]
+        ARCTool.main()
 
     os.chdir(saved_cwd)  # Restore working directory
 
@@ -61,6 +86,6 @@ def extract_all(src_root, dst_root):
 
 if __name__ == "__main__":
     # example usage
-    SRC = r"D:\ztp_work\res\Stage"
-    DST = r"D:\temp\stage_extracted"
+    SRC = "D:/ztp_work/res/Object"
+    DST = "D:/temp/object_extracted"
     extract_all(SRC, DST)
