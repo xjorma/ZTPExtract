@@ -433,7 +433,9 @@ namespace SuperBMDLib
 
             Console.WriteLine();
             Console.WriteLine("Processing Materials ->");
-            Materials.FillScene(outScene, Textures, outDir);
+            string texOutDir = Path.Combine(outDir, $"{fileNameNoExt}_tex");
+            Directory.CreateDirectory(texOutDir);
+            Materials.FillScene(outScene, Textures, texOutDir);
             Console.WriteLine();
             Console.WriteLine("Processing Meshes ->");
             Shapes.FillScene(outScene, VertexData.Attributes, Joints.FlatSkeleton, SkinningEnvelopes.InverseBindMatrices);
@@ -444,9 +446,7 @@ namespace SuperBMDLib
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Processing Textures ->");
-
-            //Textures.DumpTextures(outDir, fileNameNoExt + "_tex_headers.json", true, cmdargs.readMipmaps);
-            Textures.DumpTextures(outDir, fileNameNoExt + "_tex_headers.json", true, false);
+            Textures.DumpTextures(texOutDir, fileNameNoExt + "_tex_headers.json", true, false);
 
             if (modelType != "fbx")
             {
@@ -495,8 +495,17 @@ namespace SuperBMDLib
                         var indices = new List<int>();
                         foreach (var f in mesh.Faces)
                         {
-                            if (f.IndexCount == 3) { indices.Add(f.Indices[0]); indices.Add(f.Indices[1]); indices.Add(f.Indices[2]); }
-                            // skip non triangles, your scene builder should already triangulate
+                            if (f.IndexCount == 3)          // Should be only triangles but let's be safe.
+                            {
+                                indices.Add(f.Indices[0]);
+                                indices.Add(f.Indices[1]);
+                                indices.Add(f.Indices[2]);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Warning: Skipping non-triangle face with {f.IndexCount} indices in mesh {mesh.Name}");
+                                continue;
+                            }
                         }
 
                         // uv0 if present
@@ -524,9 +533,8 @@ namespace SuperBMDLib
 
 
                         // try to find a diffuse texture path
-                        string texPath = null;
                         var mat = outScene.Materials[mesh.MaterialIndex];
-                        if (mat.HasTextureDiffuse) texPath = mat.TextureDiffuse.FilePath;
+                        string texPath = mat.HasTextureDiffuse? mat.TextureDiffuse.FilePath : null;
 
                         writer.AddMeshWithMaterial(
                             name,
@@ -545,21 +553,7 @@ namespace SuperBMDLib
                 // delete all png and jpg files we created zelda_tex_headers.json in the output folder
                 if (cmdargs.embedd_textures)
                 {
-                    foreach (string pattern in new[] { "*.png", "*.jpg", "*.jpeg", "*_tex_headers.json" })
-                    {
-                        foreach (string file in Directory.EnumerateFiles(outDir, pattern, SearchOption.TopDirectoryOnly))
-                        {
-                            try
-                            {
-                                File.Delete(file);
-                                Console.WriteLine($"Deleted {Path.GetFileName(file)}");
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Could not delete {file}: {ex.Message}");
-                            }
-                        }
-                    }
+                    Directory.Delete(texOutDir, true);
                 }
                 return;
             }
