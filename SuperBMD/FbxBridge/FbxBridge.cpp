@@ -163,7 +163,7 @@ void FbxSceneWriter::AddMeshWithMaterial(
     }
 }
 
-void FbxSceneWriter::Save(System::String^ outPath, bool ascii)
+void FbxSceneWriter::Save(System::String^ outPath, bool ascii, bool embeddedTextures)
 {
     if (!mScene) throw gcnew System::Exception("Nothing to save, call CreateScene and add content");
 
@@ -190,7 +190,7 @@ void FbxSceneWriter::Save(System::String^ outPath, bool ascii)
     if (writerFormat < 0)
         writerFormat = reg->GetNativeWriterFormat();
 
-    mMgr->GetIOSettings()->SetBoolProp(EXP_FBX_EMBEDDED, true);
+    mMgr->GetIOSettings()->SetBoolProp(EXP_FBX_EMBEDDED, embeddedTextures);
 
     FbxExporter* exp = FbxExporter::Create(mMgr, "Exporter");
     if (!exp->Initialize(path.c_str(), writerFormat, mMgr->GetIOSettings()))

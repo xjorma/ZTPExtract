@@ -21,7 +21,7 @@ namespace FbxBridge
             array<float>^ normals,
             System::String^ texturePath);
 
-        void Save(System::String^ outPath, bool ascii);
+		void Save(System::String^ outPath, bool ascii, bool embeddedTextures);
 
     private:
         FbxManager* mMgr = nullptr;

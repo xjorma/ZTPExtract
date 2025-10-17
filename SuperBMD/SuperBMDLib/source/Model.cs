@@ -539,27 +539,28 @@ namespace SuperBMDLib
                     }
 
                     // write FBX, use binary by default
-                    writer.Save(fileName, ascii: false);
+                    writer.Save(fileName, ascii: false, embeddedTextures: cmdargs.embedd_textures);
                 }
+
                 // delete all png and jpg files we created zelda_tex_headers.json in the output folder
-                foreach (var pattern in new[] { "*.png", "*.jpg", "*.jpeg", "*_tex_headers.json" })
+                if (cmdargs.embedd_textures)
                 {
-                    foreach (var file in Directory.EnumerateFiles(outDir, pattern, SearchOption.TopDirectoryOnly))
+                    foreach (string pattern in new[] { "*.png", "*.jpg", "*.jpeg", "*_tex_headers.json" })
                     {
-                        try
+                        foreach (string file in Directory.EnumerateFiles(outDir, pattern, SearchOption.TopDirectoryOnly))
                         {
-                            File.Delete(file);
-                            Console.WriteLine($"Deleted {Path.GetFileName(file)}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Could not delete {file}: {ex.Message}");
+                            try
+                            {
+                                File.Delete(file);
+                                Console.WriteLine($"Deleted {Path.GetFileName(file)}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Could not delete {file}: {ex.Message}");
+                            }
                         }
                     }
                 }
-
-
-
                 return;
             }
 

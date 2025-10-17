@@ -25,6 +25,7 @@ namespace SuperBMDLib
         public bool forceFloat;
         public bool degenerateTriangles;
         public bool readMipmaps;
+        public bool embedd_textures;
         public bool dumpHierarchy;
         public string hierarchyPath;
         public bool exportAnims;
@@ -68,6 +69,7 @@ namespace SuperBMDLib
             forceFloat = false;
             degenerateTriangles = false;
             readMipmaps = true;
+            embedd_textures = true;
             dumpHierarchy = false;
             hierarchyPath = "";
             exportAnims = false;
@@ -179,6 +181,9 @@ namespace SuperBMDLib
                         break;
                     case "--nomipmaps":
                         readMipmaps = false;
+                        break;
+                    case "--noembed":
+                        embedd_textures = false;
                         break;
                     case "--sort_strict":
                         sort_strict = true;
